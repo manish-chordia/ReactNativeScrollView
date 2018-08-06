@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { View, PanResponder, Animated, Text } from 'react-native';
+import React from 'react';
+import { View, PanResponder } from 'react-native';
 export default class App extends React.Component {
     constructor(props) {
         super(props);
@@ -14,10 +14,6 @@ export default class App extends React.Component {
         this.viewHeight = 0;
         this.viewWidth = 0;
         this.height = 0;
-
-        this.state = {
-            animatedValue: new Animated.Value(0),
-        };
 
         this.autoScroll = this.autoScroll.bind(this);
         this.getScrollPosition = this.getScrollPosition.bind(this);
@@ -41,7 +37,7 @@ export default class App extends React.Component {
                     if (delta < -0.5 || delta > 0.5) {
                         this.prevDistanceMoved = distanceMoved;
                         this.position = this.getScrollPosition(this.position - delta);
-                        this.state.animatedValue.setValue(this.position);
+                        this.setNativeTranslation(this.position);
                     }
                 }
             },
@@ -88,6 +84,9 @@ export default class App extends React.Component {
     isScrollable() {
         return this.position > -this.height && this.position < this.min;
     }
+    getTimeConstant(decelarationRate) {
+        return -16.7 / Math.log(decelarationRate);
+    }
     autoScroll() {
         if (!this.isScrollable() || !this.isAutoScrolling) {
             return;
@@ -95,42 +94,46 @@ export default class App extends React.Component {
         let elapsed, delta;
         if (this.amplitude) {
             elapsed = Date.now() - this.timestamp;
-            delta = this.amplitude * Math.exp(-elapsed / 325);
+            const timeConstant = this.getTimeConstant(this.props.decelarationRate);
+            delta = this.amplitude * Math.exp(-elapsed / timeConstant);
             if (delta > 0.5 || delta < -0.5) {
                 this.position = this.getScrollPosition(this.target - delta);
-                this.state.animatedValue.setValue(this.position);
+                this.setNativeTranslation(this.position);
                 window.requestAnimationFrame(this.autoScroll);
             } else {
                 this.isAutoScrolling = false;
             }
         }
     }
-    render() {
-        let items = [];
-        for (let i = 0; i < 600; i++) {
-            items.push(
-                <View key={i}>
-                    <Text style={{ fontSize: 60 }}>{i}</Text>
-                </View>
-            );
-        }
+    scrollTo(position) {
+        this.position = position;
+        this.setNativeTranslation(position);
+    }
+
+    setNativeTranslation = translation => {
         let transformObject = {};
         if (this.props.horizontal) {
-            transformObject = { translateX: this.state.animatedValue };
+            transformObject = { translateX: translation };
         } else {
-            transformObject = { translateY: this.state.animatedValue };
+            transformObject = { translateY: translation };
         }
+
+        this.scrollViewRef.setNativeProps({
+            transform: [transformObject],
+        });
+    };
+
+    render() {
+        const { style, ...rest } = this.props;
+
         return (
-            <View onLayout={this.onParentLayout} style={{ height: 600 }}>
-                <Animated.View
-                    onLayout={this.onViewLayout}
-                    style={{ transform: [transformObject] }}
-                    ref={component => (this.scrollViewRef = component)}
-                    {...this._panResponder.panHandlers}
-                >
-                    {items}
-                </Animated.View>
+            <View onLayout={this.onParentLayout} style={style}>
+                <View {...rest} onLayout={this.onViewLayout} ref={component => (this.scrollViewRef = component)} {...this._panResponder.panHandlers} />
             </View>
         );
     }
 }
+
+App.defaultProps = {
+    decelarationRate: 0.95,
+};
