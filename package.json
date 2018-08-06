@@ -12,7 +12,6 @@
             "react-native bundle --platform android --dev false --minify true --entry-file index.android.js --bundle-output build/index.android.bundle --assets-dest android/app/src/main/res/",
         "ci": "sh ./tools/ci.sh",
         "docgen": "esdoc -c ./esdoc.json",
-        "precommit": "lint-staged",
         "test": "sh test/setup/setup_run.sh",
         "test-console": "sh test/setup/setup_run.sh console",
         "startWeb": "webpack-dev-server --history-api-fallback --host 0.0.0.0",
