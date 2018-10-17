@@ -17,7 +17,7 @@ export default class App extends React.Component<ScrollViewProps> {
     _panResponder: PanResponderInstance;
     scrollViewRef: any;
 
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.position = 0;
         this.min = 0;
@@ -101,7 +101,7 @@ export default class App extends React.Component<ScrollViewProps> {
     isScrollable(): boolean {
         return this.position > -this.height && this.position < this.min;
     }
-    getTimeConstant(decelerationRate) {
+    getTimeConstant(decelerationRate: any) {
         return -16.7 / Math.log(decelerationRate);
     }
     autoScroll(): void {
@@ -111,7 +111,7 @@ export default class App extends React.Component<ScrollViewProps> {
         let elapsed, delta;
         if (this.amplitude) {
             elapsed = Date.now() - this.timestamp;
-            const timeConstant = this.getTimeConstant(this.props.decelerationRate);
+            const timeConstant = this.getTimeConstant(this.props.decelerationRate || 0.95);
             delta = this.amplitude * Math.exp(-elapsed / timeConstant);
             if (delta > 0.5 || delta < -0.5) {
                 this.position = this.getScrollPosition(this.target - delta);
