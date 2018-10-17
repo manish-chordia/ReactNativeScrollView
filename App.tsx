@@ -1,7 +1,23 @@
-import React from 'react';
+import * as React from 'react';
 import { View, PanResponder } from 'react-native';
-export default class App extends React.Component {
-    constructor(props) {
+import { GestureResponderEvent, PanResponderGestureState, LayoutChangeEvent, PanResponderInstance, ScrollViewProps } from "react-native";
+
+export default class App extends React.Component<ScrollViewProps> {
+    position: number;
+    min: number;
+    pressed: boolean;
+    prevDistanceMoved: number;
+    isAutoScrolling: boolean;
+    amplitude: number;
+    target: number;
+    timestamp: number;
+    viewHeight: number;
+    viewWidth: number;
+    height: number;
+    _panResponder: PanResponderInstance;
+    scrollViewRef: any;
+
+    constructor(props: any) {
         super(props);
         this.position = 0;
         this.min = 0;
@@ -30,7 +46,7 @@ export default class App extends React.Component {
                 this.pressed = true;
                 this.isAutoScrolling = false;
             },
-            onPanResponderMove: (evt, gestureState) => {
+            onPanResponderMove: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
                 const distanceMoved = this.props.horizontal ? gestureState.dx : gestureState.dy;
                 if (this.pressed) {
                     const delta = this.prevDistanceMoved - distanceMoved;
@@ -42,7 +58,7 @@ export default class App extends React.Component {
                 }
             },
             onPanResponderTerminationRequest: () => true,
-            onPanResponderRelease: (evt, gestureState) => {
+            onPanResponderRelease: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
                 this.pressed = false;
                 const velocity = this.props.horizontal ? gestureState.vx * 1000 : gestureState.vy * 1000;
                 if (velocity > 10 || velocity < -10) {
@@ -65,12 +81,13 @@ export default class App extends React.Component {
             },
         });
     }
-    onViewLayout = evt => {
+
+    onViewLayout = (evt: LayoutChangeEvent) => {
         const { height, width } = evt.nativeEvent.layout;
         this.viewHeight = height;
         this.viewWidth = width;
     };
-    onParentLayout = evt => {
+    onParentLayout = (evt: LayoutChangeEvent) => {
         const { width, height } = evt.nativeEvent.layout;
         if (this.props.horizontal) {
             this.height = this.viewWidth - width;
@@ -78,23 +95,23 @@ export default class App extends React.Component {
             this.height = this.viewHeight - height;
         }
     };
-    getScrollPosition(position) {
+    getScrollPosition(position: number): number {
         return position > 0 ? 0 : position < -this.height ? -this.height : position;
     }
-    isScrollable() {
+    isScrollable(): boolean {
         return this.position > -this.height && this.position < this.min;
     }
-    getTimeConstant(decelarationRate) {
-        return -16.7 / Math.log(decelarationRate);
+    getTimeConstant(decelerationRate: any) {
+        return -16.7 / Math.log(decelerationRate);
     }
-    autoScroll() {
+    autoScroll(): void {
         if (!this.isScrollable() || !this.isAutoScrolling) {
             return;
         }
         let elapsed, delta;
         if (this.amplitude) {
             elapsed = Date.now() - this.timestamp;
-            const timeConstant = this.getTimeConstant(this.props.decelarationRate);
+            const timeConstant = this.getTimeConstant(this.props.decelerationRate || 0.95);
             delta = this.amplitude * Math.exp(-elapsed / timeConstant);
             if (delta > 0.5 || delta < -0.5) {
                 this.position = this.getScrollPosition(this.target - delta);
@@ -105,12 +122,12 @@ export default class App extends React.Component {
             }
         }
     }
-    scrollTo(position) {
+    scrollTo(position: number): void {
         this.position = position;
         this.setNativeTranslation(position);
     }
 
-    setNativeTranslation = translation => {
+    setNativeTranslation = (translation: number) => {
         let transformObject = {};
         if (this.props.horizontal) {
             transformObject = { translateX: translation };
@@ -128,12 +145,13 @@ export default class App extends React.Component {
 
         return (
             <View onLayout={this.onParentLayout} style={style}>
-                <View {...rest} onLayout={this.onViewLayout} ref={component => (this.scrollViewRef = component)} {...this._panResponder.panHandlers} />
+                <View 
+                    {...rest} 
+                    onLayout={this.onViewLayout} 
+                    ref={(component: any) => (this.scrollViewRef = component)} 
+                    {...this._panResponder.panHandlers} 
+                />
             </View>
         );
     }
 }
-
-App.defaultProps = {
-    decelarationRate: 0.95,
-};
