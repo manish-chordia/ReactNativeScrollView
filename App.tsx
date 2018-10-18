@@ -86,6 +86,10 @@ export default class App extends React.Component<ScrollViewProps> {
         const { height, width } = evt.nativeEvent.layout;
         this.viewHeight = height;
         this.viewWidth = width;
+
+        if(this.props.onContentSizeChange) {
+            this.props.onContentSizeChange(width, height);
+        }
     };
     onParentLayout = (evt: LayoutChangeEvent) => {
         const { width, height } = evt.nativeEvent.layout;
