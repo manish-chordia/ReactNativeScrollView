@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, PanResponder } from 'react-native';
-export default class App extends React.Component {
+import { View, PanResponder, Text } from 'react-native';
+export default class ScrollView extends React.Component {
     constructor(props) {
         super(props);
         this.position = 0;
@@ -79,7 +79,9 @@ export default class App extends React.Component {
         }
     };
     getScrollPosition(position) {
-        return position > 0 ? 0 : position < -this.height ? -this.height : position;
+        var currPos = position > 0 ? 0 : position < -this.height ? -this.height : position;
+        this.props.onScroll && this.props.onScroll(currPos);
+        return currPos;
     }
     isScrollable() {
         return this.position > -this.height && this.position < this.min;
@@ -125,15 +127,21 @@ export default class App extends React.Component {
 
     render() {
         const { style, ...rest } = this.props;
+        console.log()
 
         return (
             <View onLayout={this.onParentLayout} style={style}>
-                <View {...rest} onLayout={this.onViewLayout} ref={component => (this.scrollViewRef = component)} {...this._panResponder.panHandlers} />
+                <View {...rest} onLayout={this.onViewLayout} ref={component => (this.scrollViewRef = component)} {...this._panResponder.panHandlers} >
+                    {this.props.children}
+                </View>    
             </View>
         );
     }
 }
 
-App.defaultProps = {
+ScrollView.defaultProps = {
     decelarationRate: 0.95,
+    style: {
+        height: 150
+    }
 };

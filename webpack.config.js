@@ -8,13 +8,7 @@ var PROD = !DEV;
 var APP_NAME = require('./package.json').name;
 var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = {
-    entry: PROD
-        ? {
-              app: ['./index.web.js'],
-              vendor: ['fk-react-native-web'],
-              commonVendor: ['react-dom', 'prop-types', 'whatwg-fetch', 'es6-set'],
-          }
-        : {
+    entry: {
               app: ['whatwg-fetch', './index.web.js'],
           },
     output: {
