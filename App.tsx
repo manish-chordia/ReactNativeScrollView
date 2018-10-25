@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, PanResponder } from 'react-native';
 import { GestureResponderEvent, PanResponderGestureState, LayoutChangeEvent, PanResponderInstance, ScrollViewProps } from "react-native";
 
-export default class App extends React.Component<ScrollViewProps> {
+export default class App extends React.Component<any> {
     position: number;
     min: number;
     pressed: boolean;
@@ -16,6 +16,8 @@ export default class App extends React.Component<ScrollViewProps> {
     height: number;
     _panResponder: PanResponderInstance;
     scrollViewRef: any;
+    distanceMoved: number;
+    shouldScroll: boolean;
 
     constructor(props: any) {
         super(props);
@@ -30,10 +32,13 @@ export default class App extends React.Component<ScrollViewProps> {
         this.viewHeight = 0;
         this.viewWidth = 0;
         this.height = 0;
+        this.distanceMoved = 0;
+        this.shouldScroll = true;
 
         this.autoScroll = this.autoScroll.bind(this);
         this.getScrollPosition = this.getScrollPosition.bind(this);
         this.isScrollable = this.isScrollable.bind(this);
+        this.allowScroll = this.allowScroll.bind(this);
 
         this._panResponder = PanResponder.create({
             // Ask to be the responder:
@@ -100,7 +105,9 @@ export default class App extends React.Component<ScrollViewProps> {
         }
     };
     getScrollPosition(position: number): number {
-        return position > 0 ? 0 : position < -this.height ? -this.height : position;
+        position = position > 0 ? 0 : position < -this.height ? -this.height : position;
+        this.distanceMoved = position - this.position;
+        return position;
     }
     isScrollable(): boolean {
         return this.position > -this.height && this.position < this.min;
@@ -127,11 +134,25 @@ export default class App extends React.Component<ScrollViewProps> {
         }
     }
     scrollTo(position: number): void {
+        position = position > 0 ? 0 : position < -this.height ? -this.height : position;
+        this.distanceMoved = position - this.position;
         this.position = position;
         this.setNativeTranslation(position);
     }
 
+    allowScroll(shouldScrollViewScroll: boolean): void {
+        this.shouldScroll = shouldScrollViewScroll;
+    }
+
     setNativeTranslation = (translation: number) => {
+        const scrollObject = {
+            id: this.props.id,
+            distanceMoved: this.distanceMoved,
+            scrollPosition: this.position,
+            scrollableAreaRemaining: this.height + this.position,
+            allowScroll: this.allowScroll
+        };
+        this.props.onScroll && this.props.onScroll(scrollObject);
         let transformObject = {};
         if (this.props.horizontal) {
             transformObject = { translateX: translation };
