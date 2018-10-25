@@ -45,7 +45,7 @@
         "babel-preset-react": "6.24.1",
         "fk-react-native-web": "^0.1.13",
         "immutable": "3.7.6",
-        "lodash": "4.17.4",
+        "lodash": ">=4.17.5",
         "prop-types": "15.5.8",
         "raven-js": "3.5.1",
         "react": "16.4.1",
