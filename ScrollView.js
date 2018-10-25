@@ -132,7 +132,6 @@ export default class ScrollView extends React.Component {
         return (
             <View onLayout={this.onParentLayout} style={style}>
                 <View {...rest} onLayout={this.onViewLayout} ref={component => (this.scrollViewRef = component)} {...this._panResponder.panHandlers} >
-                    {this.props.children}
                 </View>    
             </View>
         );
