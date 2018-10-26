@@ -107,6 +107,9 @@ var App = /** @class */ (function (_super) {
             },
             onPanResponderMove: function (evt, gestureState) {
                 var distanceMoved = _this.props.horizontal ? gestureState.dx : gestureState.dy;
+                if (!_this.shouldScroll) {
+                    return;
+                }
                 if (_this.pressed) {
                     var delta = _this.prevDistanceMoved - distanceMoved;
                     if (delta < -0.5 || delta > 0.5) {
@@ -153,7 +156,7 @@ var App = /** @class */ (function (_super) {
         return -16.7 / Math.log(decelerationRate);
     };
     App.prototype.autoScroll = function () {
-        if (!this.isScrollable() || !this.isAutoScrolling) {
+        if (!this.isScrollable() || !this.isAutoScrolling || !this.shouldScroll) {
             return;
         }
         var elapsed, delta;

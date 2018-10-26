@@ -53,6 +53,9 @@ export default class App extends React.Component<any> {
             },
             onPanResponderMove: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
                 const distanceMoved = this.props.horizontal ? gestureState.dx : gestureState.dy;
+                if(!this.shouldScroll) {
+                    return;
+                }
                 if (this.pressed) {
                     const delta = this.prevDistanceMoved - distanceMoved;
                     if (delta < -0.5 || delta > 0.5) {
@@ -116,7 +119,7 @@ export default class App extends React.Component<any> {
         return -16.7 / Math.log(decelerationRate);
     }
     autoScroll(): void {
-        if (!this.isScrollable() || !this.isAutoScrolling) {
+        if (!this.isScrollable() || !this.isAutoScrolling || !this.shouldScroll) {
             return;
         }
         let elapsed, delta;
