@@ -58,14 +58,7 @@ var App = /** @class */ (function (_super) {
             }
         };
         _this.setNativeTranslation = function (translation) {
-            var scrollObject = {
-                id: _this.props.id,
-                distanceMoved: _this.distanceMoved,
-                scrollPosition: _this.position,
-                scrollableAreaRemaining: _this.height + _this.position,
-                allowScroll: _this.allowScroll
-            };
-            _this.props.onScroll && _this.props.onScroll(scrollObject);
+            _this.sendScrollEvent();
             var transformObject = {};
             if (_this.props.horizontal) {
                 transformObject = { translateX: translation };
@@ -94,6 +87,7 @@ var App = /** @class */ (function (_super) {
         _this.getScrollPosition = _this.getScrollPosition.bind(_this);
         _this.isScrollable = _this.isScrollable.bind(_this);
         _this.allowScroll = _this.allowScroll.bind(_this);
+        _this.sendScrollEvent = _this.sendScrollEvent.bind(_this);
         _this._panResponder = react_native_1.PanResponder.create({
             // Ask to be the responder:
             onStartShouldSetPanResponder: function () { return true; },
@@ -108,6 +102,7 @@ var App = /** @class */ (function (_super) {
             onPanResponderMove: function (evt, gestureState) {
                 var distanceMoved = _this.props.horizontal ? gestureState.dx : gestureState.dy;
                 if (!_this.shouldScroll) {
+                    _this.sendScrollEvent();
                     return;
                 }
                 if (_this.pressed) {
@@ -157,6 +152,9 @@ var App = /** @class */ (function (_super) {
     };
     App.prototype.autoScroll = function () {
         if (!this.isScrollable() || !this.isAutoScrolling || !this.shouldScroll) {
+            if (!this.shouldScroll) {
+                this.sendScrollEvent();
+            }
             return;
         }
         var elapsed, delta;
@@ -182,6 +180,16 @@ var App = /** @class */ (function (_super) {
     };
     App.prototype.allowScroll = function (shouldScrollViewScroll) {
         this.shouldScroll = shouldScrollViewScroll;
+    };
+    App.prototype.sendScrollEvent = function () {
+        var scrollObject = {
+            id: this.props.id,
+            distanceMoved: this.distanceMoved,
+            scrollPosition: this.position,
+            scrollableAreaRemaining: this.height + this.position,
+            allowScroll: this.allowScroll
+        };
+        this.props.onScroll && this.props.onScroll(scrollObject);
     };
     App.prototype.render = function () {
         var _this = this;

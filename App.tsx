@@ -39,6 +39,7 @@ export default class App extends React.Component<any> {
         this.getScrollPosition = this.getScrollPosition.bind(this);
         this.isScrollable = this.isScrollable.bind(this);
         this.allowScroll = this.allowScroll.bind(this);
+        this.sendScrollEvent = this.sendScrollEvent.bind(this);
 
         this._panResponder = PanResponder.create({
             // Ask to be the responder:
@@ -54,6 +55,7 @@ export default class App extends React.Component<any> {
             onPanResponderMove: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
                 const distanceMoved = this.props.horizontal ? gestureState.dx : gestureState.dy;
                 if(!this.shouldScroll) {
+                    this.sendScrollEvent();
                     return;
                 }
                 if (this.pressed) {
@@ -120,6 +122,9 @@ export default class App extends React.Component<any> {
     }
     autoScroll(): void {
         if (!this.isScrollable() || !this.isAutoScrolling || !this.shouldScroll) {
+            if(!this.shouldScroll) {
+                this.sendScrollEvent();
+            }
             return;
         }
         let elapsed, delta;
@@ -147,7 +152,7 @@ export default class App extends React.Component<any> {
         this.shouldScroll = shouldScrollViewScroll;
     }
 
-    setNativeTranslation = (translation: number) => {
+    sendScrollEvent() {
         const scrollObject = {
             id: this.props.id,
             distanceMoved: this.distanceMoved,
@@ -156,6 +161,10 @@ export default class App extends React.Component<any> {
             allowScroll: this.allowScroll
         };
         this.props.onScroll && this.props.onScroll(scrollObject);
+    }
+
+    setNativeTranslation = (translation: number) => {
+        this.sendScrollEvent();
         let transformObject = {};
         if (this.props.horizontal) {
             transformObject = { translateX: translation };
