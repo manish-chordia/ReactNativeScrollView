@@ -1,6 +1,7 @@
 {
     "name": "ReactNativeScrollView",
-    "version": "0.0.6",
+    "version": "0.0.7",
+    "main": "dist/App.js",
     "scripts": {
         "start": "react-native start",
         "build": "sh tools/verifyNodeVersion.sh && react-native bundle --platform ios --entry-file index.ios.js --dev false --minify true --prepack false --bundle-output ./build/fk-react-native/reactnative.ios.js",
