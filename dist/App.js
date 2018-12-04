@@ -62,10 +62,18 @@ export default class App extends React.Component {
         this.sendScrollEvent = this.sendScrollEvent.bind(this);
         this._panResponder = PanResponder.create({
             // Ask to be the responder:
+
+            //Bubble phase
             onStartShouldSetPanResponder: () => true,
-            onStartShouldSetPanResponderCapture: () => true,
+
+            /* commenting out the below to avoid eating up all the scroll events in the page
             onMoveShouldSetPanResponder: () => true,
+
+            //Capture phase
+            onStartShouldSetPanResponderCapture: () => true,
             onMoveShouldSetPanResponderCapture: () => true,
+            */
+
             onPanResponderGrant: () => {
                 this.prevDistanceMoved = 0;
                 this.pressed = true;
