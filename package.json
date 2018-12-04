@@ -1,6 +1,6 @@
 {
     "name": "ReactNativeScrollView",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "main": "dist/App.js",
     "scripts": {
         "start": "react-native start",
