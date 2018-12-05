@@ -19,6 +19,10 @@ export default class App extends React.Component<any> {
     distanceMoved: number;
     shouldScroll: boolean;
 
+    static defaultProps = {
+        listenOnCapture: false
+    }
+
     constructor(props: any) {
         super(props);
         this.position = 0;
@@ -43,10 +47,17 @@ export default class App extends React.Component<any> {
 
         this._panResponder = PanResponder.create({
             // Ask to be the responder:
-            onStartShouldSetPanResponder: () => true,
-            onStartShouldSetPanResponderCapture: () => true,
-            onMoveShouldSetPanResponder: () => true,
-            onMoveShouldSetPanResponderCapture: () => true,
+            
+            //Bubble phase
+            onStartShouldSetPanResponder: () => !this.props.listenOnCapture,
+
+            /* commenting out the below to avoid eating up all the scroll events in the page */
+            // onMoveShouldSetPanResponder: () => true,
+
+            //Capture phase
+            onStartShouldSetPanResponderCapture: () => this.props.listenOnCapture,
+            // onMoveShouldSetPanResponderCapture: () => true,
+
             onPanResponderGrant: () => {
                 this.prevDistanceMoved = 0;
                 this.pressed = true;
