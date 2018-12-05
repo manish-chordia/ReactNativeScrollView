@@ -10,6 +10,9 @@ var __rest = (this && this.__rest) || function (s, e) {
 import * as React from 'react';
 import { View, PanResponder } from 'react-native';
 export default class App extends React.Component {
+    static defaultProps = {
+        listenOnCapture: false
+    }
     constructor(props) {
         super(props);
         this.onViewLayout = (evt) => {
@@ -64,15 +67,14 @@ export default class App extends React.Component {
             // Ask to be the responder:
 
             //Bubble phase
-            onStartShouldSetPanResponder: () => true,
+            onStartShouldSetPanResponder: () => !this.props.listenOnCapture,
 
-            /* commenting out the below to avoid eating up all the scroll events in the page
-            onMoveShouldSetPanResponder: () => true,
+            /* commenting out the below to avoid eating up all the scroll events in the page */
+            // onMoveShouldSetPanResponder: () => true,
 
             //Capture phase
-            onStartShouldSetPanResponderCapture: () => true,
-            onMoveShouldSetPanResponderCapture: () => true,
-            */
+            onStartShouldSetPanResponderCapture: () => this.props.listenOnCapture,
+            // onMoveShouldSetPanResponderCapture: () => true,
 
             onPanResponderGrant: () => {
                 this.prevDistanceMoved = 0;
